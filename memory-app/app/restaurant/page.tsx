@@ -2,9 +2,29 @@ import {
   getRecommendations,
   mockedRestaurants,
 } from "@/actions/getRecommendations";
+import { redirect } from "next/navigation";
 
-export default async function Home() {
-  const restaurants = await getRecommendations();
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ permissionToken: string }>;
+}) {
+  const sp = await searchParams;
+
+  const permissionToken = sp.permissionToken;
+
+  const { data: restaurants, success } = await getRecommendations(
+    permissionToken
+  );
+
+  if (!success) {
+    redirect(
+      `/authorize?${new URLSearchParams({
+        permission: "Get your food preferences",
+        redirectUrl: "/restaurant",
+      })}`
+    );
+  }
 
   return (
     <main className="container mx-auto py-10 px-4">
@@ -17,7 +37,7 @@ export default async function Home() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {mockedRestaurants
-          .filter((restaurant) => restaurants.includes(restaurant.name))
+          .filter((restaurant) => restaurants?.includes(restaurant.name))
           .map((restaurant) => (
             <div
               key={restaurant.id}

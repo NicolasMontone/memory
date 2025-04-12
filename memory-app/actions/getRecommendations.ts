@@ -4,18 +4,16 @@ import { openai } from "@ai-sdk/openai";
 
 
 
-export async function getRecommendations() {
-
-	const foodPreferencesToken = 'e24d6637-666e-40d3-b2cd-65debc3aa4af'
+export async function getRecommendations(permissionToken: string) {
 
 	const response = await fetch(`http://localhost:3000/api/prompt?${new URLSearchParams({ question: "what is the users favorite foods" }).toString()}`, {
 		headers: {
-			'Authorization': `Bearer ${foodPreferencesToken}`
+			'Authorization': `Bearer ${permissionToken}`
 		}
 	});
 
 	if (!response.ok) {
-		throw new Error("Failed to fetch favorite foods");
+		return { success: false, error: "Failed to fetch favorite foods" }
 	}
 
 	const favouriteFoods = await response.text();
@@ -37,7 +35,7 @@ export async function getRecommendations() {
 
 	const restaurantNames = restaurants.object.restaurants;
 
-	return restaurantNames;
+	return { data: restaurantNames, success: true };
 }
 
 export const mockedRestaurants = [

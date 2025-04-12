@@ -16,4 +16,4 @@ export async function createPermission(prompt: string): Promise<Permission> {
 	await writePermission(newPermission);
 
 	return newPermission;
-} 
+} 	
