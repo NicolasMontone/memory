@@ -10,6 +10,7 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
+
 # Caches
 
 .cache
@@ -58,6 +59,8 @@ build/Release
 
 node_modules/
 jspm_packages/
+
+build/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 
