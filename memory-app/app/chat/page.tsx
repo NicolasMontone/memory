@@ -19,13 +19,20 @@ export default function Chat ({
   const sp = use(searchParams)
   const permissionToken = sp.permissionToken
 
-  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
-    api: '/api/chat',
-    headers: {
-      permissionToken
-    },
-    initialMessages
-  })
+  const { messages, input, handleInputChange, handleSubmit, status, reload } =
+    useChat({
+      api: '/api/chat',
+      headers: {
+        permissionToken
+      },
+      initialMessages
+    })
+
+  useEffect(() => {
+    if (permissionToken) {
+      reload()
+    }
+  }, [permissionToken, reload])
 
   useEffect(() => {
     if (status === 'ready') {
