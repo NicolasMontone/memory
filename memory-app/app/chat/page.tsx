@@ -1,14 +1,21 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
-import { Send } from 'lucide-react'
-import { use } from 'react'
+import { Plus, Send } from 'lucide-react'
+import { use, useEffect, useMemo } from 'react'
 
 export default function Chat ({
   searchParams
 }: {
   searchParams: Promise<{ permissionToken: string }>
 }) {
+  const initialMessages = useMemo(() => {
+    if (typeof localStorage !== 'undefined') {
+      const messages = localStorage.getItem('messages')
+      return messages ? JSON.parse(messages) : []
+    }
+    return []
+  }, [])
   const sp = use(searchParams)
   const permissionToken = sp.permissionToken
 
@@ -16,16 +23,34 @@ export default function Chat ({
     api: '/api/chat',
     headers: {
       permissionToken
-    }
+    },
+    initialMessages
   })
 
-  console.log('messages', messages)
-
+  useEffect(() => {
+    if (status === 'ready') {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('messages', JSON.stringify(messages))
+      }
+    }
+  }, [messages, status])
   return (
     <div className='flex flex-col h-screen bg-gray-50'>
       {/* Header */}
-      <header className='bg-white shadow-sm p-4'>
+      <header className='bg-white shadow-sm p-4 flex justify-between'>
         <h1 className='text-xl font-semibold text-gray-800'>Memory Chat</h1>
+        <button
+          className='bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+          aria-label='New chat'
+          onClick={() => {
+            if (typeof localStorage !== 'undefined') {
+              localStorage.removeItem('messages')
+              window.location.href = '/chat'
+            }
+          }}
+        >
+          <Plus className='w-5 h-5' />
+        </button>
       </header>
 
       {/* Messages Container */}
