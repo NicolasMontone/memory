@@ -3,6 +3,7 @@
 import { useChat } from '@ai-sdk/react'
 import { Plus, Send } from 'lucide-react'
 import { use, useEffect, useMemo } from 'react'
+import Markdown from 'react-markdown'
 
 export default function Chat ({
   searchParams
@@ -76,13 +77,56 @@ export default function Chat ({
             )}
             <div className='flex flex-col gap-2 max-w-[80%]'>
               <div
-                className={`max-w-full rounded-2xl p-4 ${
+                className={`max-w-full rounded-2xl pt-2 pb-4 px-4 ${
                   message.role === 'user'
                     ? 'bg-blue-600 text-white ml-auto'
                     : 'bg-gray-800 text-gray-100'
                 }`}
               >
-                <p className='text-sm leading-relaxed'>{message.content}</p>
+                <Markdown
+                  components={{
+                    a: ({ href, children }) => (
+                      <a href={href} className='text-blue-500'>
+                        {children}
+                      </a>
+                    ),
+                    p: ({ children }) => <p className='mb-2'>{children}</p>,
+                    h3: ({ children }) => (
+                      <h3 className='text-lg font-bold mb-2'>{children}</h3>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className='text-xl font-bold mb-2'>{children}</h2>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className='list-disc pl-5 mb-4'>{children}</ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className='list-decimal pl-5 mb-4'>{children}</ol>
+                    ),
+                    li: ({ children }) => <li className='mb-2'>{children}</li>,
+                    code: ({ children }) => (
+                      <code className='bg-gray-900 text-white p-1 rounded-md'>
+                        {children}
+                      </code>
+                    ),
+                    blockquote: ({ children }) => (
+                      <blockquote className='border-l-2 border-gray-300 pl-4 py-2 my-4'>
+                        {children}
+                      </blockquote>
+                    ),
+                    table: ({ children }) => (
+                      <table className='w-full border-collapse border border-gray-700'>
+                        {children}
+                      </table>
+                    ),
+                    th: ({ children }) => (
+                      <th className='bg-gray-800 text-white p-2'>{children}</th>
+                    ),
+                    td: ({ children }) => <td className='p-2'>{children}</td>
+                  }}
+                >
+                  {message.content}
+                </Markdown>
               </div>
               {message.role === 'assistant' &&
                 message.parts.some(
