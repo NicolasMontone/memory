@@ -41,89 +41,64 @@ export default function Chat ({
       }
     }
   }, [messages, status])
+
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
-      {/* Header */}
-      <header className='bg-white shadow-sm p-4 flex justify-between'>
-        <h1 className='text-xl font-semibold text-gray-800'>Memory Chat</h1>
+    <div className='flex flex-col h-screen bg-gray-900'>
+      {/* New Chat Button */}
+      <div className='p-4 flex justify-end'>
         <button
-          className='bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
-          aria-label='New chat'
           onClick={() => {
             if (typeof localStorage !== 'undefined') {
               localStorage.removeItem('messages')
               window.location.href = '/chat'
             }
           }}
+          className='bg-gray-800 text-gray-300 hover:text-white rounded-full p-2 hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900'
+          aria-label='Start new chat'
         >
           <Plus className='w-5 h-5' />
         </button>
-      </header>
+      </div>
 
       {/* Messages Container */}
-      <div className='flex-1 overflow-y-auto p-4 space-y-4'>
-        {messages.map((message, index) => {
-          console.log(
-            'message',
-            message.role === 'assistant' &&
-              message.parts.some(
-                part =>
-                  part.type === 'tool-invocation' &&
-                  part.toolInvocation.state === 'result' &&
-                  'redirectUrl' in part.toolInvocation.result
-              )
-          )
-          return (
-            <div
-              key={index}
-              className={`flex ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              <div className='flex flex-col gap-2 max-w-[80%]'>
-                <div
-                  className={`max-w-full rounded-lg p-4 ${
-                    message.role === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white text-gray-800 shadow-sm'
-                  }`}
-                >
-                  <p className='text-sm'>{message.content}</p>
-                </div>
-                {message.role === 'assistant' &&
-                  message.parts.some(
-                    part =>
-                      part.type === 'tool-invocation' &&
-                      part.toolInvocation.state === 'result' &&
-                      'redirectUrl' in part.toolInvocation.result
-                  ) && (
-                    <div className='max-w-[300px] bg-white rounded-lg p-4 shadow-md border border-gray-200 mt-2'>
-                      <div className='flex flex-col items-center gap-3'>
-                        <div className='text-center'>
-                          <h3 className='font-medium text-gray-800'>
-                            Permission Request
-                          </h3>
-                          <p className='text-sm text-gray-600 mt-1'>
-                            {
-                              (
-                                message.parts.find(
-                                  part =>
-                                    part.type === 'tool-invocation' &&
-                                    part.toolInvocation.state === 'result' &&
-                                    'redirectUrl' in part.toolInvocation.result
-                                ) as {
-                                  toolInvocation: {
-                                    args: {
-                                      query: string
-                                    }
-                                  }
-                                }
-                              ).toolInvocation.args.query
-                            }
-                          </p>
-                        </div>
-                        <a
-                          href={
+      <div className='flex-1 overflow-y-auto p-4 space-y-6'>
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`flex ${
+              message.role === 'user' ? 'justify-end' : 'justify-start'
+            }`}
+          >
+            {message.role === 'assistant' && (
+              <div className='w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2'>
+                <span className='text-gray-300 text-sm'>AI</span>
+              </div>
+            )}
+            <div className='flex flex-col gap-2 max-w-[80%]'>
+              <div
+                className={`max-w-full rounded-2xl p-4 ${
+                  message.role === 'user'
+                    ? 'bg-blue-600 text-white ml-auto'
+                    : 'bg-gray-800 text-gray-100'
+                }`}
+              >
+                <p className='text-sm leading-relaxed'>{message.content}</p>
+              </div>
+              {message.role === 'assistant' &&
+                message.parts.some(
+                  part =>
+                    part.type === 'tool-invocation' &&
+                    part.toolInvocation.state === 'result' &&
+                    'redirectUrl' in part.toolInvocation.result
+                ) && (
+                  <div className='max-w-[300px] bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-700 mt-2'>
+                    <div className='flex flex-col items-center gap-3'>
+                      <div className='text-center'>
+                        <h3 className='font-medium text-gray-100'>
+                          Permission Request
+                        </h3>
+                        <p className='text-sm text-gray-300 mt-1'>
+                          {
                             (
                               message.parts.find(
                                 part =>
@@ -132,30 +107,51 @@ export default function Chat ({
                                   'redirectUrl' in part.toolInvocation.result
                               ) as {
                                 toolInvocation: {
-                                  result: {
-                                    redirectUrl: string
+                                  args: {
+                                    query: string
                                   }
                                 }
                               }
-                            ).toolInvocation.result.redirectUrl
+                            ).toolInvocation.args.query
                           }
-                          className='w-full'
-                          aria-label='Grant permission access'
-                        >
-                          <button className='w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer'>
-                            Grant Access
-                          </button>
-                        </a>
+                        </p>
                       </div>
+                      <a
+                        href={
+                          (
+                            message.parts.find(
+                              part =>
+                                part.type === 'tool-invocation' &&
+                                part.toolInvocation.state === 'result' &&
+                                'redirectUrl' in part.toolInvocation.result
+                            ) as {
+                              toolInvocation: {
+                                result: {
+                                  redirectUrl: string
+                                }
+                              }
+                            }
+                          ).toolInvocation.result.redirectUrl
+                        }
+                        className='w-full'
+                        aria-label='Grant permission access'
+                      >
+                        <button className='w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer'>
+                          Grant Access
+                        </button>
+                      </a>
                     </div>
-                  )}
-              </div>
+                  </div>
+                )}
             </div>
-          )
-        })}
+          </div>
+        ))}
         {status === 'streaming' && (
-          <div className='flex justify-start'>
-            <div className='bg-white rounded-lg p-4 shadow-sm'>
+          <div className='flex justify-start items-center'>
+            <div className='w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2'>
+              <span className='text-gray-300 text-sm'>AI</span>
+            </div>
+            <div className='bg-gray-800 rounded-2xl p-4 shadow-sm'>
               <div className='flex space-x-2'>
                 <div className='w-2 h-2 bg-gray-400 rounded-full animate-bounce' />
                 <div className='w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100' />
@@ -169,21 +165,21 @@ export default function Chat ({
       {/* Input Form */}
       <form
         onSubmit={handleSubmit}
-        className='border-t border-gray-200 bg-white p-4'
+        className='border-t border-gray-800 bg-gray-900 p-4'
       >
-        <div className='flex items-center space-x-2'>
+        <div className='flex items-center space-x-2 max-w-4xl mx-auto'>
           <input
             value={input}
             onChange={handleInputChange}
-            placeholder='Type your message...'
-            className='flex-1 rounded-lg border text-black border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+            placeholder='Type a message...'
+            className='flex-1 rounded-full bg-gray-800 text-gray-100 border-none px-6 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 placeholder-gray-400'
             disabled={status === 'streaming'}
             aria-label='Message input'
           />
           <button
             type='submit'
             disabled={status === 'streaming' || !input.trim()}
-            className='bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+            className='bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200'
             aria-label='Send message'
           >
             <Send className='w-5 h-5' />
